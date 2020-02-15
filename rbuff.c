@@ -45,82 +45,82 @@ uint32_t rbuff_size(rbuff_t *rbuff)
   return rbuff->size;
 }
 //------------------------------------------------------------------------------
-uint8_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t size)
+uint8_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff->capacity - rbuff->size < size) return 0;
+  if(rbuff->capacity - rbuff->size < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write;
-  if(to_end >= size)
+  if(to_end >= len)
   {
-    memcpy(rbuff->write, buff, size);
-    rbuff->write += size;
+    memcpy(rbuff->write, buff, len);
+    rbuff->write += len;
   }
   else
   {
     memcpy(rbuff->write, buff, to_end);
-    memcpy(rbuff->buff, buff + to_end, size - to_end);
-    rbuff->write = rbuff->buff + size - to_end;
+    memcpy(rbuff->buff, buff + to_end, len - to_end);
+    rbuff->write = rbuff->buff + len - to_end;
   }
 
   __disable_irq();
-  rbuff->size += size;
+  rbuff->size += len;
   __enable_irq();
 
   return 1;
 }
 //------------------------------------------------------------------------------
-uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t size)
+uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff->capacity - rbuff->size < size) return 0;
+  if(rbuff->capacity - rbuff->size < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write;
-  if(to_end >= size)
+  if(to_end >= len)
   {
-    rbuff_read(w_rbuff, rbuff->write, size);
-    rbuff->write += size;
+    rbuff_read(w_rbuff, rbuff->write, len);
+    rbuff->write += len;
   }
   else
   {
     rbuff_read(w_rbuff, rbuff->write, to_end);
-    rbuff_read(w_rbuff, rbuff->buff, size - to_end);
-    rbuff->write = rbuff->buff + size - to_end;
+    rbuff_read(w_rbuff, rbuff->buff, len - to_end);
+    rbuff->write = rbuff->buff + len - to_end;
   }
 
   __disable_irq();
-  rbuff->size += size;
+  rbuff->size += len;
   __enable_irq();
 
   return 1;
 }
 //------------------------------------------------------------------------------
-uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t size)
+uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 {
   uint32_t to_end;
 
   if(rbuff->size == 0) return 0;
-  if(rbuff->size < size) size = rbuff->size;
+  if(rbuff->size < len) len = rbuff->size;
 
   to_end = rbuff->buff_end - rbuff->read;
-  if(to_end >= size)
+  if(to_end >= len)
   {
-    memcpy(buff, rbuff->read, size);
-    rbuff->read += size;
+    memcpy(buff, rbuff->read, len);
+    rbuff->read += len;
   }
   else
   {
     memcpy(buff, rbuff->read, to_end);
-    memcpy(buff + to_end, rbuff->buff, size - to_end);
-    rbuff->read = rbuff->buff + size - to_end;
+    memcpy(buff + to_end, rbuff->buff, len - to_end);
+    rbuff->read = rbuff->buff + len - to_end;
   }
 
   __disable_irq();
-  rbuff->size -= size;
+  rbuff->size -= len;
   __enable_irq();
 
-  return size;
+  return len;
 }
 //------------------------------------------------------------------------------
