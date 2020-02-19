@@ -5,7 +5,7 @@
  *      Author: Martin
  */
 //------------------------------------------------------------------------------
-#include "ring_buffer.h"
+#include "rbuff.h"
 #include "cmsis_gcc.h"
 
 //------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ uint32_t rbuff_size(rbuff_t *rbuff)
   return rbuff->size;
 }
 //------------------------------------------------------------------------------
-uint8_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
+uint32_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 {
   uint32_t to_end;
 
