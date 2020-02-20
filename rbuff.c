@@ -124,3 +124,27 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   return len;
 }
 //------------------------------------------------------------------------------
+uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len)
+{
+  uint32_t to_end;
+
+  if(rbuff->size == 0) return 0;
+  if(rbuff->size < len) len = rbuff->size;
+
+  to_end = rbuff->buff_end - rbuff->read;
+  if(to_end >= len)
+  {
+    rbuff->read += len;
+  }
+  else
+  {
+    rbuff->read = rbuff->buff + len - to_end;
+  }
+
+  __disable_irq();
+  rbuff->size -= len;
+  __enable_irq();
+
+  return len;
+}
+//------------------------------------------------------------------------------
