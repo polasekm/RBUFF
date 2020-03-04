@@ -21,13 +21,13 @@ void rbuff_init(rbuff_t *rbuff, uint8_t *buff, uint32_t size)
   rbuff->write = buff;
 
   rbuff->capacity = size;
-  rbuff->size = 0;
+  //rbuff->size = 0;
 }
 //------------------------------------------------------------------------------
 void rbuff_reset(rbuff_t *rbuff)
 {
   rbuff->read = rbuff->write;
-  rbuff->size = 0;
+  //rbuff->size = 0;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_cap(rbuff_t *rbuff)
@@ -37,19 +37,23 @@ uint32_t rbuff_cap(rbuff_t *rbuff)
 //------------------------------------------------------------------------------
 uint32_t rbuff_available(rbuff_t *rbuff)
 {
-  return rbuff->capacity - rbuff->size;
+  return rbuff->capacity - rbuff_size(rbuff);
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_size(rbuff_t *rbuff)
 {
-  return rbuff->size;
+  //return rbuff->size;
+  if(rbuff->write >= rbuff->read)
+    return(rbuff->write - rbuff->read);
+  else
+    return((rbuff->write - rbuff->buff) + (rbuff->buff_end - rbuff->read));
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff->capacity - rbuff->size < len) return 0;
+  if(rbuff->capacity - rbuff_size(rbuff) < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write;
   if(to_end >= len)
@@ -64,9 +68,9 @@ uint32_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
     rbuff->write = rbuff->buff + len - to_end;
   }
 
-  __disable_irq();
+  /*__disable_irq();
   rbuff->size += len;
-  __enable_irq();
+  __enable_irq();*/
 
   return 1;
 }
@@ -75,7 +79,7 @@ uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff->capacity - rbuff->size < len) return 0;
+  if(rbuff->capacity - rbuff_size(rbuff) < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write;
   if(to_end >= len)
@@ -90,19 +94,22 @@ uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len)
     rbuff->write = rbuff->buff + len - to_end;
   }
 
-  __disable_irq();
+  /*__disable_irq();
   rbuff->size += len;
-  __enable_irq();
+  __enable_irq();*/
 
   return 1;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 {
-  uint32_t to_end;
+  uint32_t to_end, size;
 
-  if(rbuff->size == 0) return 0;
-  if(rbuff->size < len) len = rbuff->size;
+  size = rbuff_size(rbuff);
+
+  if(size == 0) return 0;
+
+  if(size < len) len = size;
 
   to_end = rbuff->buff_end - rbuff->read;
   if(to_end >= len)
@@ -117,19 +124,21 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
     rbuff->read = rbuff->buff + len - to_end;
   }
 
-  __disable_irq();
+  /*__disable_irq();
   rbuff->size -= len;
-  __enable_irq();
+  __enable_irq();*/
 
   return len;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len)
 {
-  uint32_t to_end;
+  uint32_t to_end, size;
 
-  if(rbuff->size == 0) return 0;
-  if(rbuff->size < len) len = rbuff->size;
+  size = rbuff_size(rbuff);
+
+  if(size == 0) return 0;
+  if(size < len) len = size;
 
   to_end = rbuff->buff_end - rbuff->read;
   if(to_end >= len)
@@ -141,9 +150,9 @@ uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len)
     rbuff->read = rbuff->buff + len - to_end;
   }
 
-  __disable_irq();
+  /*__disable_irq();
   rbuff->size -= len;
-  __enable_irq();
+  __enable_irq();*/
 
   return len;
 }
