@@ -26,7 +26,6 @@ typedef struct
   uint8_t *write;       //zapisovaci ukazatel
 
   uint32_t capacity;    //kapacita bufferu
-  //uint32_t size;        //zaplneni bufferu
 
 } rbuff_t;
 
