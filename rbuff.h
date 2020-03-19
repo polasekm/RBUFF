@@ -35,6 +35,7 @@ typedef struct
 // Functions -------------------------------------------------------------------
 void rbuff_reset(rbuff_t *rbuff);
 void rbuff_init(rbuff_t *rbuff, uint8_t *buff, uint32_t size);
+void rbuff_lin_space(rbuff_t *rbuff, uint8_t *buff, uint32_t size);
 
 uint32_t rbuff_capacity(rbuff_t *rbuff);
 uint32_t rbuff_available(rbuff_t *rbuff);

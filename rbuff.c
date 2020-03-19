@@ -22,6 +22,17 @@ void rbuff_init(rbuff_t *rbuff, uint8_t *buff, uint32_t size)
   rbuff->capacity = size;
 }
 //------------------------------------------------------------------------------
+void rbuff_lin_space(rbuff_t *rbuff, uint8_t *buff, uint32_t size)
+{
+  rbuff->buff = buff;
+  rbuff->buff_end = buff + size;
+
+  rbuff->read = buff;
+  rbuff->write = buff + size;
+
+  rbuff->capacity = size;
+}
+//------------------------------------------------------------------------------
 void rbuff_reset(rbuff_t *rbuff)
 {
   rbuff->read = rbuff->write;
@@ -62,6 +73,25 @@ uint32_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
     memcpy(rbuff->write, buff, to_end);
     memcpy(rbuff->buff, buff + to_end, len - to_end);
     rbuff->write = rbuff->buff + len - to_end;
+  }
+
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
+{
+  if(rbuff->capacity - rbuff_size(rbuff) < 1) return 0;
+  
+  if(rbuff->buff_end > rbuff->write)
+  {
+    *rbuff->write = data;
+    rbuff->write++;
+  }
+  else
+  {
+    rbuff->write = rbuff->buff;
+    *rbuff->write = data;
+    rbuff->write++;
   }
 
   return 1;
@@ -113,6 +143,25 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   }
 
   return len;
+}
+//------------------------------------------------------------------------------
+uint8_t rbuff_read_b(rbuff_t *rbuff, uint8_t *data)
+{
+  if(rbuff_size(rbuff) == 0) return 0;
+
+  if(rbuff->buff_end > rbuff->read)
+  {
+    *data = *rbuff->read;
+    rbuff->read++;
+  }
+  else
+  {
+    rbuff->read = rbuff->buff;
+    *data = *rbuff->read;
+    rbuff->read++;
+  }
+
+  return 1;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len)
