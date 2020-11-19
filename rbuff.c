@@ -78,10 +78,47 @@ uint32_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   return 1;
 }
 //------------------------------------------------------------------------------
+uint32_t rbuff_write_force(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
+{
+  uint32_t to_end;
+
+  to_end = rbuff->buff_end - rbuff->write;
+  if(to_end >= len)
+  {
+    memcpy(rbuff->write, buff, len);
+    rbuff->write += len;
+  }
+  else
+  {
+    memcpy(rbuff->write, buff, to_end);
+    memcpy(rbuff->buff, buff + to_end, len - to_end);
+    rbuff->write = rbuff->buff + len - to_end;
+  }
+
+  return 1;
+}
+//------------------------------------------------------------------------------
 uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
 {
   if(rbuff->capacity - rbuff_size(rbuff) < 1) return 0;
   
+  if(rbuff->buff_end > rbuff->write)
+  {
+    *rbuff->write = data;
+    rbuff->write++;
+  }
+  else
+  {
+    rbuff->write = rbuff->buff;
+    *rbuff->write = data;
+    rbuff->write++;
+  }
+
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint8_t rbuff_write_b_force(rbuff_t *rbuff, uint8_t data)
+{
   if(rbuff->buff_end > rbuff->write)
   {
     *rbuff->write = data;
