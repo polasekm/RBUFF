@@ -6,8 +6,13 @@
  *      Author: Martin
  */
 /*-----------------------------------------------------------------------------*/
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef RING_BUFFER_H_INCLUDED
 #define RING_BUFFER_H_INCLUDED
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
@@ -56,5 +61,9 @@ uint32_t rbuff_peek(rbuff_t *rbuff, uint8_t *buff, uint32_t len);
 uint32_t rbuff_peek_b(rbuff_t *rbuff, uint8_t *data);
 
 uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len);
+//------------------------------------------------------------------------------
+#ifdef __cplusplus
+}
+#endif
 //------------------------------------------------------------------------------
 #endif /* RING_BUFFER_H_INCLUDED */
