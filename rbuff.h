@@ -61,6 +61,9 @@ uint32_t rbuff_peek(rbuff_t *rbuff, uint8_t *buff, uint32_t len);
 uint32_t rbuff_peek_b(rbuff_t *rbuff, uint8_t *data);
 
 uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len);
+
+uint32_t rbuff_seek_wp(rbuff_t *rbuff, int32_t len);
+uint32_t rbuff_set_wp(rbuff_t *rbuff, int32_t pos);
 //------------------------------------------------------------------------------
 #ifdef __cplusplus
 }
