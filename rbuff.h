@@ -50,6 +50,7 @@ uint32_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len);
 uint32_t rbuff_write_force(rbuff_t *rbuff, uint8_t *buff, uint32_t len);
 uint8_t  rbuff_write_b(rbuff_t *rbuff, uint8_t data);
 uint8_t  rbuff_write_b_force(rbuff_t *rbuff, uint8_t data);
+uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len);
 
 uint8_t rbuff_copy(rbuff_t *rbuff_dst, rbuff_t *rbuff_src, uint32_t len);
 uint8_t rbuff_move(rbuff_t *rbuff_dst, rbuff_t *rbuff_src, uint32_t len);
