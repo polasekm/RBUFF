@@ -182,6 +182,16 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   return len;
 }
 //------------------------------------------------------------------------------
+uint32_t rbuff_peek(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
+{
+	uint32_t actual = rbuff_read(rbuff, buff, len);
+	if (rbuff->read < rbuff->buff + actual)
+		rbuff->read += rbuff->buff_end - rbuff->buff - actual;
+	else
+		rbuff->read -= actual;
+    return actual;
+}
+//------------------------------------------------------------------------------
 uint8_t rbuff_read_b(rbuff_t *rbuff, uint8_t *data)
 {
   if(rbuff_size(rbuff) == 0) return 0;
