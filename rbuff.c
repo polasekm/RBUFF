@@ -56,7 +56,7 @@ uint32_t rbuff_size(rbuff_t *rbuff)
     return((rbuff->write - rbuff->buff) + (rbuff->buff_end - rbuff->read));
 }
 //------------------------------------------------------------------------------
-uint32_t rbuff_write(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
+uint32_t rbuff_write(rbuff_t *rbuff, const uint8_t *buff, uint32_t len)
 {
   uint32_t to_end;
 
