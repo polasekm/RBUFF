@@ -212,9 +212,11 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   else
   {
     if (to_end==0)
-      to_end=0;
+      to_end=0; //to asi nemuze kvuli +1
     if (to_end==1)
       to_end=1;
+    if (to_end==len)
+      to_end=len;
     memcpy(buff, rbuff->read, to_end);
     memcpy(buff + to_end, rbuff->buff, len - to_end);
     rbuff->read = rbuff->buff + len - to_end;
@@ -225,11 +227,13 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 //------------------------------------------------------------------------------
 uint32_t rbuff_peek(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 {
+  uint8_t *proc_jednoduse=rbuff->read;
 	uint32_t actual = rbuff_read(rbuff, buff, len);
-	if (rbuff->read < rbuff->buff + actual)
+	rbuff->read=proc_jednoduse;
+	/*if (rbuff->read < rbuff->buff + actual)
 		rbuff->read += rbuff->buff_end - rbuff->buff - actual;
 	else
-		rbuff->read -= actual;
+		rbuff->read -= actual;*/
   return actual;
 }
 //------------------------------------------------------------------------------
@@ -252,7 +256,7 @@ uint8_t rbuff_read_b(rbuff_t *rbuff, uint8_t *data)
     rbuff->read++;
   }
   else
-  {
+  { //sem se asi nechodi?
     rbuff->read = rbuff->buff;
     *data = *rbuff->read;
     rbuff->read++;
