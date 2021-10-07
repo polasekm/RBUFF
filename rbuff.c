@@ -88,7 +88,7 @@ uint32_t rbuff_write(rbuff_t *rbuff, const uint8_t *buff, uint32_t len)
     rbuff->write = rbuff->buff + len - to_end;
   }
 
-  return 1;
+  return len;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_write_force(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
@@ -108,7 +108,7 @@ uint32_t rbuff_write_force(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
     rbuff->write = rbuff->buff + len - to_end;
   }
 
-  return 1;
+  return len;
 }
 //------------------------------------------------------------------------------
 uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
@@ -120,7 +120,7 @@ uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
   if(rbuff_available(rbuff) == 1-1)
     rbuff_size(rbuff); //nevejde
   if(rbuff_available(rbuff) < 1) return 0;
-  
+
   if(rbuff->buff_end == rbuff->write)
   {
     *rbuff->write = data;
@@ -185,7 +185,7 @@ uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len)
     rbuff->write = rbuff->buff + len - to_end;
   }
 
-  return 1;
+  return len;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
