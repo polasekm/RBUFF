@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1633542182 source:/home/polasekm/ownCloud/SEA/Projects/GSM-TIPEC4/fw/GSM-TIPEC4_STM32Lxxx/GSM-TIPEC4_STM32L433RCTx/Libs/rbuff/rbuff.c
+	"rbuff.h"
+
+1625430094 /home/polasekm/ownCloud/SEA/Projects/GSM-TIPEC4/fw/GSM-TIPEC4_STM32Lxxx/GSM-TIPEC4_STM32L433RCTx/Libs/rbuff/rbuff.h
+	<string.h>
+	<stdint.h>
+
+1633611684 source:/home/polasekm/ownCloud/SEA/Projects/GSM-TIPEC4/fw/GSM-TIPEC4_STM32Lxxx/GSM-TIPEC4_STM32L433RCTx/Libs/rbuff/tests/rbuff_test/main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"../../rbuff.h"
+
