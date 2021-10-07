@@ -172,8 +172,13 @@ uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len)
     rbuff_size(rbuff); //nevejde
   if(rbuff_available(rbuff) < len) return 0;
 
-  to_end = rbuff->buff_end - rbuff->write;
-  if(to_end >= len)
+  to_end = rbuff->buff_end - rbuff->write + 1;
+  if(to_end == len)
+  {
+    rbuff_read(w_rbuff, rbuff->write, len);
+    rbuff->write = rbuff->buff;
+  }
+  else if(to_end > len)
   {
     rbuff_read(w_rbuff, rbuff->write, len);
     rbuff->write += len;
