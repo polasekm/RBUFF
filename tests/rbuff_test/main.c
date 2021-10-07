@@ -27,12 +27,14 @@ int main()
 
     srand (time(NULL));
 
+    //-------------------------------------------------------
     for(i = 0; i < 8000000; i++)
     {
         set_a[i] = rand() % 256;
     }
 
     printf("Testovaci sada byla vytvorena\n");
+    printf("Zahajuji test _read _write\n");
 
     rbuff_init(&rbuff, buff, 30);
 
@@ -62,7 +64,81 @@ int main()
             break;
         }
     }
-    if(i == 8000000) printf("Testovaci mnoziny jsou stejne\n");
+    //-------------------------------------------------------
+    for(i = 0; i < 8000000; i++)
+    {
+        set_a[i] = rand() % 256;
+    }
+
+    printf("Testovaci sada byla vytvorena\n");
+    printf("Zahajuji test _peak _seek _write\n");
+
+    rbuff_init(&rbuff, buff, 30);
+
+    read = 0;
+    write = 0;
+
+    do
+    {
+        n = rand() % 40;
+        if(read + n >= 8000000) n = 8000000 - read;
+        n = rbuff_write(&rbuff, set_a + read, n);
+        read += n;
+
+        n = rand() % 40;
+        if(write + n >= 8000000) n = 8000000 - write;
+
+        n = rbuff_peek(&rbuff, set_b + write, n);
+        n = rbuff_seek(&rbuff, n);
+        write += n;
+    }
+    while(write < 8000000);
+
+    for(i = 0; i < 8000000; i++)
+    {
+        if(set_a[i] != set_b[i])
+        {
+            printf("Testovaci mnoziny nejsou stejne!\n");
+            break;
+        }
+    }
+    //-------------------------------------------------------
+    for(i = 0; i < 8000000; i++)
+    {
+        set_a[i] = rand() % 256;
+    }
+
+    printf("Testovaci sada byla vytvorena\n");
+    printf("Zahajuji test _read_b _write_b\n");
+
+    rbuff_init(&rbuff, buff, 30);
+
+    read = 0;
+    write = 0;
+
+    do
+    {
+        n = rand() % 40;
+        if(read + n >= 8000000) n = 8000000 - read;
+        for(i = 0; i < n; i++) read += rbuff_write_b(&rbuff, *(set_a + read));
+
+        n = rand() % 40;
+        if(write + n >= 8000000) n = 8000000 - write;
+        for(i = 0; i < n; i++) write += rbuff_read_b(&rbuff, set_b + write);
+    }
+    while(write < 8000000);
+
+    for(i = 0; i < 8000000; i++)
+    {
+        if(set_a[i] != set_b[i])
+        {
+            printf("Testovaci mnoziny nejsou stejne!\n");
+            break;
+        }
+    }
+    //-------------------------------------------------------
+
+    //if(i == 8000000) printf("Testovaci mnoziny jsou stejne\n");
 
     printf("Test byl dokoncen\n");
 
