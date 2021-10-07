@@ -45,7 +45,7 @@ uint32_t rbuff_cap(rbuff_t *rbuff)
 //------------------------------------------------------------------------------
 uint32_t rbuff_available(rbuff_t *rbuff)
 {
-  return rbuff->capacity - rbuff_size(rbuff);
+  return rbuff->capacity - rbuff_size(rbuff) - 1;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_size(rbuff_t *rbuff)
@@ -53,14 +53,22 @@ uint32_t rbuff_size(rbuff_t *rbuff)
   if(rbuff->write >= rbuff->read)
     return(rbuff->write - rbuff->read);
   else
-    return((rbuff->write - rbuff->buff) + (rbuff->buff_end - rbuff->read))+1;
+    return((rbuff->write - rbuff->buff) + (rbuff->buff_end - rbuff->read)) + 1;
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_write(rbuff_t *rbuff, const uint8_t *buff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff->capacity - rbuff_size(rbuff) < len) return 0;
+  if(rbuff_available(rbuff) == len+1)
+    rbuff_size(rbuff); //vejde
+  if(rbuff_available(rbuff) == len+0)
+    rbuff_size(rbuff); //vejde
+  if(rbuff_available(rbuff) == len-1)
+    rbuff_size(rbuff); //nevejde
+  if(rbuff_available(rbuff) == len-2)
+    rbuff_size(rbuff); //nevejde
+  if(rbuff_available(rbuff) < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write;
   if(to_end >= len)
@@ -100,7 +108,13 @@ uint32_t rbuff_write_force(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 //------------------------------------------------------------------------------
 uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
 {
-  if(rbuff->capacity - rbuff_size(rbuff) < 1) return 0;
+  if(rbuff_available(rbuff) == 1+1)
+    rbuff_size(rbuff); //vejde
+  if(rbuff_available(rbuff) == 1+0)
+    rbuff_size(rbuff); //vejde
+  if(rbuff_available(rbuff) == 1-1)
+    rbuff_size(rbuff); //nevejde
+  if(rbuff_available(rbuff) < 1) return 0;
   
   if(rbuff->buff_end > rbuff->write)
   {
@@ -138,7 +152,15 @@ uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff->capacity - rbuff_size(rbuff) < len) return 0;
+  if(rbuff_available(rbuff) == len+1)
+    rbuff_size(rbuff);
+  if(rbuff_available(rbuff) == len+0)
+    rbuff_size(rbuff);
+  if(rbuff_available(rbuff) == len-1)
+    rbuff_size(rbuff);
+  if(rbuff_available(rbuff) == len-2)
+    rbuff_size(rbuff); //nevejde
+  if(rbuff_available(rbuff) < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write;
   if(to_end >= len)
@@ -174,6 +196,10 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   }
   else
   {
+    if (to_end==0)
+      to_end=0;
+    if (to_end==1)
+      to_end=1;
     memcpy(buff, rbuff->read, to_end);
     memcpy(buff + to_end, rbuff->buff, len - to_end);
     rbuff->read = rbuff->buff + len - to_end;
@@ -196,6 +222,10 @@ uint8_t rbuff_read_b(rbuff_t *rbuff, uint8_t *data)
 {
   if(rbuff_size(rbuff) == 0) return 0;
 
+  if(rbuff->buff_end == rbuff->read)
+    rbuff_size(rbuff);
+  if(rbuff->buff_end == rbuff->read+1)
+    rbuff_size(rbuff);
   if(rbuff->buff_end > rbuff->read)
   {
     *data = *rbuff->read;
