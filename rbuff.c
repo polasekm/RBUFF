@@ -70,8 +70,13 @@ uint32_t rbuff_write(rbuff_t *rbuff, const uint8_t *buff, uint32_t len)
     rbuff_size(rbuff); //nevejde
   if(rbuff_available(rbuff) < len) return 0;
 
-  to_end = rbuff->buff_end - rbuff->write;
-  if(to_end >= len)
+  to_end = rbuff->buff_end - rbuff->write + 1;
+  if(to_end == len)
+  {
+    memcpy(rbuff->write, buff, len);
+    rbuff->write = rbuff->buff;
+  }
+  else if(to_end > len)
   {
     memcpy(rbuff->write, buff, len);
     rbuff->write += len;
@@ -116,7 +121,12 @@ uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
     rbuff_size(rbuff); //nevejde
   if(rbuff_available(rbuff) < 1) return 0;
   
-  if(rbuff->buff_end > rbuff->write)
+  if(rbuff->buff_end == rbuff->write)
+  {
+    *rbuff->write = data;
+    rbuff->write = rbuff->buff;
+  }
+  else if(rbuff->buff_end > rbuff->write)
   {
     *rbuff->write = data;
     rbuff->write++;
@@ -188,8 +198,13 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 
   if(size < len) len = size;
 
-  to_end = rbuff->buff_end - rbuff->read;
-  if(to_end >= len)
+  to_end = rbuff->buff_end - rbuff->read + 1;
+  if(to_end == len)
+  {
+    memcpy(buff, rbuff->read, len);
+    rbuff->read = rbuff->buff;
+  }
+  else if(to_end > len)
   {
     memcpy(buff, rbuff->read, len);
     rbuff->read += len;
@@ -215,7 +230,7 @@ uint32_t rbuff_peek(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 		rbuff->read += rbuff->buff_end - rbuff->buff - actual;
 	else
 		rbuff->read -= actual;
-    return actual;
+  return actual;
 }
 //------------------------------------------------------------------------------
 uint8_t rbuff_read_b(rbuff_t *rbuff, uint8_t *data)
@@ -226,7 +241,12 @@ uint8_t rbuff_read_b(rbuff_t *rbuff, uint8_t *data)
     rbuff_size(rbuff);
   if(rbuff->buff_end == rbuff->read+1)
     rbuff_size(rbuff);
-  if(rbuff->buff_end > rbuff->read)
+  if(rbuff->buff_end == rbuff->read)
+  {
+    *data = *rbuff->read;
+    rbuff->read = rbuff->buff;
+  }
+  else if(rbuff->buff_end > rbuff->read)
   {
     *data = *rbuff->read;
     rbuff->read++;
@@ -250,8 +270,8 @@ uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len)
   if(size == 0) return 0;
   if(size < len) len = size;
 
-  to_end = rbuff->buff_end - rbuff->read;
-  if(to_end >= len)
+  to_end = rbuff->buff_end - rbuff->read + 1;
+  if(to_end > len)
   {
     rbuff->read += len;
   }
