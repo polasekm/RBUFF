@@ -60,26 +60,18 @@ uint32_t rbuff_write(rbuff_t *rbuff, const uint8_t *buff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff_available(rbuff) == len+1)
-    rbuff_size(rbuff); //vejde
-  if(rbuff_available(rbuff) == len+0)
-    rbuff_size(rbuff); //vejde
-  if(rbuff_available(rbuff) == len-1)
-    rbuff_size(rbuff); //nevejde
-  if(rbuff_available(rbuff) == len-2)
-    rbuff_size(rbuff); //nevejde
   if(rbuff_available(rbuff) < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write + 1;
-  if(to_end == len)
-  {
-    memcpy(rbuff->write, buff, len);
-    rbuff->write = rbuff->buff;
-  }
-  else if(to_end > len)
+  if(to_end > len)
   {
     memcpy(rbuff->write, buff, len);
     rbuff->write += len;
+  }
+  else if(to_end == len)
+  {
+    memcpy(rbuff->write, buff, to_end);
+    rbuff->write = rbuff->buff;
   }
   else
   {
@@ -92,7 +84,7 @@ uint32_t rbuff_write(rbuff_t *rbuff, const uint8_t *buff, uint32_t len)
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_write_force(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
-{
+{ //pravdepodobne nefunguje
   uint32_t to_end;
 
   to_end = rbuff->buff_end - rbuff->write;
@@ -113,26 +105,20 @@ uint32_t rbuff_write_force(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
 //------------------------------------------------------------------------------
 uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
 {
-  if(rbuff_available(rbuff) == 1+1)
-    rbuff_size(rbuff); //vejde
-  if(rbuff_available(rbuff) == 1+0)
-    rbuff_size(rbuff); //vejde
-  if(rbuff_available(rbuff) == 1-1)
-    rbuff_size(rbuff); //nevejde
   if(rbuff_available(rbuff) < 1) return 0;
 
-  if(rbuff->buff_end == rbuff->write)
-  {
-    *rbuff->write = data;
-    rbuff->write = rbuff->buff;
-  }
-  else if(rbuff->buff_end > rbuff->write)
+  if(rbuff->buff_end > rbuff->write)
   {
     *rbuff->write = data;
     rbuff->write++;
   }
-  else
+  else if(rbuff->buff_end == rbuff->write)
   {
+    *rbuff->write = data;
+    rbuff->write = rbuff->buff;
+  }
+  else
+  { //sem se asi nechodi
     rbuff->write = rbuff->buff;
     *rbuff->write = data;
     rbuff->write++;
@@ -142,7 +128,7 @@ uint8_t rbuff_write_b(rbuff_t *rbuff, uint8_t data)
 }
 //------------------------------------------------------------------------------
 uint8_t rbuff_write_b_force(rbuff_t *rbuff, uint8_t data)
-{
+{ //pravdepodobne nefunguje
   if(rbuff->buff_end > rbuff->write)
   {
     *rbuff->write = data;
@@ -162,26 +148,18 @@ uint8_t rbuff_write_rb(rbuff_t *rbuff, rbuff_t *w_rbuff, uint32_t len)
 {
   uint32_t to_end;
 
-  if(rbuff_available(rbuff) == len+1)
-    rbuff_size(rbuff);
-  if(rbuff_available(rbuff) == len+0)
-    rbuff_size(rbuff);
-  if(rbuff_available(rbuff) == len-1)
-    rbuff_size(rbuff);
-  if(rbuff_available(rbuff) == len-2)
-    rbuff_size(rbuff); //nevejde
   if(rbuff_available(rbuff) < len) return 0;
 
   to_end = rbuff->buff_end - rbuff->write + 1;
-  if(to_end == len)
-  {
-    rbuff_read(w_rbuff, rbuff->write, len);
-    rbuff->write = rbuff->buff;
-  }
-  else if(to_end > len)
+  if(to_end > len)
   {
     rbuff_read(w_rbuff, rbuff->write, len);
     rbuff->write += len;
+  }
+  else if(to_end == len)
+  {
+    rbuff_read(w_rbuff, rbuff->write, len);
+    rbuff->write = rbuff->buff;
   }
   else
   {
@@ -204,24 +182,18 @@ uint32_t rbuff_read(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   if(size < len) len = size;
 
   to_end = rbuff->buff_end - rbuff->read + 1;
-  if(to_end == len)
-  {
-    memcpy(buff, rbuff->read, len);
-    rbuff->read = rbuff->buff;
-  }
-  else if(to_end > len)
+  if(to_end > len)
   {
     memcpy(buff, rbuff->read, len);
     rbuff->read += len;
   }
+  else if(to_end == len)
+  {
+    memcpy(buff, rbuff->read, len);
+    rbuff->read = rbuff->buff;
+  }
   else
   {
-    if (to_end==0)
-      to_end=0; //to asi nemuze kvuli +1
-    if (to_end==1)
-      to_end=1;
-    if (to_end==len)
-      to_end=len;
     memcpy(buff, rbuff->read, to_end);
     memcpy(buff + to_end, rbuff->buff, len - to_end);
     rbuff->read = rbuff->buff + len - to_end;
@@ -235,10 +207,6 @@ uint32_t rbuff_peek(rbuff_t *rbuff, uint8_t *buff, uint32_t len)
   uint8_t *proc_jednoduse=rbuff->read;
 	uint32_t actual = rbuff_read(rbuff, buff, len);
 	rbuff->read=proc_jednoduse;
-	/*if (rbuff->read < rbuff->buff + actual)
-		rbuff->read += rbuff->buff_end - rbuff->buff - actual;
-	else
-		rbuff->read -= actual;*/
   return actual;
 }
 //------------------------------------------------------------------------------
@@ -246,19 +214,15 @@ uint8_t rbuff_read_b(rbuff_t *rbuff, uint8_t *data)
 {
   if(rbuff_size(rbuff) == 0) return 0;
 
-  if(rbuff->buff_end == rbuff->read)
-    rbuff_size(rbuff);
-  if(rbuff->buff_end == rbuff->read+1)
-    rbuff_size(rbuff);
-  if(rbuff->buff_end == rbuff->read)
-  {
-    *data = *rbuff->read;
-    rbuff->read = rbuff->buff;
-  }
-  else if(rbuff->buff_end > rbuff->read)
+  if(rbuff->buff_end > rbuff->read)
   {
     *data = *rbuff->read;
     rbuff->read++;
+  }
+  else if(rbuff->buff_end == rbuff->read)
+  {
+    *data = *rbuff->read;
+    rbuff->read = rbuff->buff;
   }
   else
   { //sem se asi nechodi?
