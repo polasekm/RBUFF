@@ -256,7 +256,7 @@ uint32_t rbuff_seek(rbuff_t *rbuff, int32_t len)
   return len;
 }
 //------------------------------------------------------------------------------
-uint32_t rbuff_seek_wp(rbuff_t *rbuff, int32_t len)
+/*uint32_t rbuff_seek_wp(rbuff_t *rbuff, int32_t len)
 {
 
 }
@@ -264,5 +264,5 @@ uint32_t rbuff_seek_wp(rbuff_t *rbuff, int32_t len)
 uint32_t rbuff_set_wp(rbuff_t *rbuff, int32_t pos)
 {
 
-}
+}*/
 //------------------------------------------------------------------------------
