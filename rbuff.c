@@ -48,12 +48,25 @@ uint32_t rbuff_available(rbuff_t *rbuff)
   return rbuff->capacity - rbuff_size(rbuff) - 1;
 }
 //------------------------------------------------------------------------------
+static uint32_t rbuff_size_total=0;
+static uint32_t rbuff_size_diff=0;
 uint32_t rbuff_size(rbuff_t *rbuff)
 {
   if(rbuff->write >= rbuff->read)
     return(rbuff->write - rbuff->read);
   else
-    return((rbuff->write - rbuff->buff) + (rbuff->buff_end - rbuff->read)) + 1;
+  {
+    return rbuff->write - rbuff->read + rbuff->capacity;
+    ////end=buff+cap-1 -> rbuff->write - rbuff->read + cap
+    uint32_t x1=((rbuff->write - rbuff->buff) + (rbuff->buff_end - rbuff->read)) + 1;
+    uint32_t x2=rbuff->write - rbuff->read + rbuff->capacity;
+    rbuff_size_total++;
+    if (x1!=x2)
+      rbuff_size_diff++; //se deje protoze mezi tim pribyvaji data
+    //a test je na prd, kdyz dam x2+1 tak da access violation, x2-1 bezi na veky
+    //kdyz pocitam x2 stejne jako x1 tak chyby rostou zhruba stejne
+    return x2;
+  }
 }
 //------------------------------------------------------------------------------
 uint32_t rbuff_write(rbuff_t *rbuff, const uint8_t *buff, uint32_t len)
